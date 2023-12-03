@@ -21,6 +21,11 @@ if (!isset($_SESSION['loggedin'])) {
 			<div>
 				<h1>Fresh Tomatoes</h1>
 				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
+				<!-- Search Form -->
+				<form action="search.php" method="get" class="searchbar">
+					<input type="text" name="search_query" placeholder="Search for movies..." class="search-input">
+					<input type="submit" value="Search" class="search-button">
+				</form>
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>

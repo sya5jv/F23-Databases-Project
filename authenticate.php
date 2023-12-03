@@ -38,6 +38,7 @@
         // if($passwordAttempt == $user['password']){
             
             // Provide the user with a login session.
+            $_SESSION['UserId'] = $user['UserId'];
             $_SESSION['Users'] = $_POST['username'];
             $_SESSION['loggedin'] = TRUE;
             $_SESSION['password'] = $passwordAttempt;
