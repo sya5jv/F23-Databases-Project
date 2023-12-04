@@ -7,25 +7,27 @@ if (!isset($_SESSION['loggedin'])) {
 }
 
 include 'connect-db.php';
-
+$data = json_decode(file_get_contents('php://input'), true);
 $userId = $_SESSION['UserId'];
-$reviewId = $_POST['reviewId'];
+$reviewId = $data['reviewId'];
 
 $checkLikeSql = "SELECT COUNT(*) FROM Likes WHERE UserId = ? AND reviewId = ?";
 $checkLikeStmt = $db->prepare($checkLikeSql);
 $checkLikeStmt->execute([$userId, $reviewId]);
 
 if ($checkLikeStmt->fetchColumn() > 0) {
-    echo json_encode(['success' => false, 'message' => 'User has already liked this comment']);
+    echo json_encode(['success' => false, 'message' => 'User has already liked this review']);
     exit;
 }
 
 $insertLikeSql = "INSERT INTO Likes (UserId, reviewId) VALUES (?, ?)";
 $insertLikeStmt = $db->prepare($insertLikeSql);
+$insertLikeStmt->execute([$userId, $reviewId]);
 
-if ($insertLikeStmt->execute([$userId, $reviewId])) {
-    echo json_encode(['success' => true, 'message' => 'Comment liked successfully']);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Failed to like comment']);
-}
+$newLikeCountSql = "SELECT COUNT(*) FROM Likes WHERE reviewId = ?";
+$newLikeCountStmt = $db->prepare($newLikeCountSql);
+$newLikeCountStmt->execute([$reviewId]);
+$newLikeCount = $newLikeCountStmt->fetchColumn();
+
+echo json_encode(['success' => true, 'newLikeCount' => $newLikeCount, 'message' => 'Review liked successfully']);
 ?>

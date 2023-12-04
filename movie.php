@@ -48,7 +48,6 @@ include "navbar.php";
       <link href="style.css" rel="stylesheet" type="text/css">
    </head>
    <body class="loggedin">
-
       <div class="content">
       <div class="movie-details">
          <div class="movie-title">
@@ -74,7 +73,6 @@ include "navbar.php";
          <p><strong>Runtime:</strong> <?= htmlspecialchars($movie['runtime']) ?> minutes</p>
          <p><strong>Genre:</strong> <?= htmlspecialchars($movie['genre']) ?></p>
          <p><strong>Summary:</strong> <?= nl2br(htmlspecialchars($movie['summary'])) ?></p>
-
          <p><strong>Average Score:</strong> <?= htmlspecialchars($movie['average_movie_score']) ?></p>
          <p><strong>Director:</strong> <?= htmlspecialchars($movie['director']) ?></p>
       </div>
@@ -98,6 +96,22 @@ include "navbar.php";
             <p><?= htmlspecialchars($review['review_text']) ?></p>
             <p><strong>Rating:</strong> <?= htmlspecialchars($review['rating']) ?> </p>
             <p> <strong>Date:</strong> <?= htmlspecialchars($review['review_time']) ?></p>
+            <!-- Like Button -->
+            <?php
+               $checkLikeSql = "SELECT COUNT(*) FROM Likes WHERE UserId = ? AND reviewId = ?";
+               $checkLikeStmt = $db->prepare($checkLikeSql);
+               $checkLikeStmt->execute([$userId, $review['reviewId']]);
+               $hasLiked = $checkLikeStmt->fetchColumn() > 0;
+               
+               $likeCountSql = "SELECT COUNT(*) FROM Likes WHERE reviewId = ?";
+               $likeCountStmt = $db->prepare($likeCountSql);
+               $likeCountStmt->execute([$review['reviewId']]);
+               $likeCount = $likeCountStmt->fetchColumn();
+               
+               echo "<strong>Number of likes: </strong><span class='like-count' id='like-count-{$review['reviewId']}'>$likeCount</span>";
+               echo "<br>";
+               echo '<button class="like-button" data-review-id="' . $review['reviewId'] . '" data-action="' . ($hasLiked ? 'unlike' : 'like') . '">' . ($hasLiked ? 'Unlike' : 'Like') . '</button>';
+               ?>
             <p>----------------------------------</p>
             <!-- Replies -->
             <?php
@@ -140,76 +154,105 @@ include "navbar.php";
          <?php endforeach; ?>
       </div>
       <script>
-         // JavaScript to toggle visibility of reply form when clicking "Reply"
-         const replyButtons = document.querySelectorAll('.reply-button');
-         const replyForms = document.querySelectorAll('.reply-form');
-         const cancelButtons = document.querySelectorAll('.cancel-button');
+         document.querySelectorAll('.like-button').forEach(button => {
+         button.addEventListener('click', function() {
+         const reviewId = this.getAttribute('data-review-id');
+         const action = this.getAttribute('data-action');
+         const likeCountElement = document.getElementById(`like-count-${reviewId}`);
          
-         replyButtons.forEach((button, index) => {
-             button.addEventListener('click', () => {
-                 // Hide other reply forms and hide the clicked "Reply" button
-                 replyForms.forEach((form, formIndex) => {
-                     if (formIndex !== index) {
-                         form.style.display = 'none';
-                         replyButtons[formIndex].style.display = 'block';
-                     }
-                 });
-                 
-                 // Toggle visibility of the clicked reply form and hide the "Reply" button
-                 replyForms[index].style.display = replyForms[index].style.display === 'block' ? 'none' : 'block';
-                 button.style.display = 'none';
-             });
-             
-             cancelButtons[index].addEventListener('click', () => {
-                 // Hide the clicked reply form and show the "Reply" button
-                 replyForms[index].style.display = 'none';
-                 button.style.display = 'block';
-             });
+         fetch(action === 'like' ? 'like.php' : 'unlike.php', {
+             method: 'POST',
+             body: JSON.stringify({ reviewId }),
+             headers: { 'Content-Type': 'application/json' }
+         })
+         .then(response => response.json())
+         .then(data => {
+             if (data.success) {
+                 this.textContent = action === 'like' ? 'Unlike' : 'Like';
+                 this.setAttribute('data-action', action === 'like' ? 'unlike' : 'like');
+         
+                 // Update the like count
+                 let likeCount = parseInt(likeCountElement.textContent);
+                 likeCount = action === 'like' ? likeCount + 1 : likeCount - 1;
+                 likeCountElement.textContent = likeCount;
+             } else {
+                 alert(data.message);
+             }
          });
-         // JavaScript to handle favorite/unfavorite functionality
-         const favoriteButton = document.querySelector('.favorite-button');
+         });
+         });
          
-         if (favoriteButton) {
-             favoriteButton.addEventListener('click', () => {
-                 const action = favoriteButton.getAttribute('data-action');
          
-                 if (action === 'favorite') {
-                     // Add to favorites
-                     fetch('favorite-movie.php', {
-                         method: 'POST',
-                         body: JSON.stringify({
-                             name: '<?= $movie['name'] ?>',
-                             release_date: '<?= $movie['release_date'] ?>'
-                         }),
-                         headers: {
-                             'Content-Type': 'application/json'
-                         }
-                     }).then(response => response.json()).then(data => {
-                         if (data.success) {
-                             favoriteButton.textContent = 'Unfavorite';
-                             favoriteButton.setAttribute('data-action', 'unfavorite');
-                         }
-                     });
-                 } else if (action === 'unfavorite') {
-                     // Remove from favorites
-                     fetch('unfavorite-movie.php', {
-                         method: 'POST',
-                         body: JSON.stringify({
-                             name: '<?= $movie['name'] ?>',
-                             release_date: '<?= $movie['release_date'] ?>'
-                         }),
-                         headers: {
-                             'Content-Type': 'application/json'
-                         }
-                     }).then(response => response.json()).then(data => {
-                         if (data.success) {
-                             favoriteButton.textContent = 'Favorite';
-                             favoriteButton.setAttribute('data-action', 'favorite');
-                         }
-                     });
-                 }
-             });
-         }
+          // JavaScript to toggle visibility of reply form when clicking "Reply"
+          const replyButtons = document.querySelectorAll('.reply-button');
+          const replyForms = document.querySelectorAll('.reply-form');
+          const cancelButtons = document.querySelectorAll('.cancel-button');
+          
+          replyButtons.forEach((button, index) => {
+              button.addEventListener('click', () => {
+                  // Hide other reply forms and hide the clicked "Reply" button
+                  replyForms.forEach((form, formIndex) => {
+                      if (formIndex !== index) {
+                          form.style.display = 'none';
+                          replyButtons[formIndex].style.display = 'block';
+                      }
+                  });
+                  
+                  // Toggle visibility of the clicked reply form and hide the "Reply" button
+                  replyForms[index].style.display = replyForms[index].style.display === 'block' ? 'none' : 'block';
+                  button.style.display = 'none';
+              });
+              
+              cancelButtons[index].addEventListener('click', () => {
+                  // Hide the clicked reply form and show the "Reply" button
+                  replyForms[index].style.display = 'none';
+                  button.style.display = 'block';
+              });
+          });
+          // JavaScript to handle favorite/unfavorite functionality
+          const favoriteButton = document.querySelector('.favorite-button');
+          
+          if (favoriteButton) {
+              favoriteButton.addEventListener('click', () => {
+                  const action = favoriteButton.getAttribute('data-action');
+          
+                  if (action === 'favorite') {
+                      // Add to favorites
+                      fetch('favorite-movie.php', {
+                          method: 'POST',
+                          body: JSON.stringify({
+                              name: '<?= $movie['name'] ?>',
+                              release_date: '<?= $movie['release_date'] ?>'
+                          }),
+                          headers: {
+                              'Content-Type': 'application/json'
+                          }
+                      }).then(response => response.json()).then(data => {
+                          if (data.success) {
+                              favoriteButton.textContent = 'Unfavorite';
+                              favoriteButton.setAttribute('data-action', 'unfavorite');
+                          }
+                      });
+                  } else if (action === 'unfavorite') {
+                      // Remove from favorites
+                      fetch('unfavorite-movie.php', {
+                          method: 'POST',
+                          body: JSON.stringify({
+                              name: '<?= $movie['name'] ?>',
+                              release_date: '<?= $movie['release_date'] ?>'
+                          }),
+                          headers: {
+                              'Content-Type': 'application/json'
+                          }
+                      }).then(response => response.json()).then(data => {
+                          if (data.success) {
+                              favoriteButton.textContent = 'Favorite';
+                              favoriteButton.setAttribute('data-action', 'favorite');
+                          }
+                      });
+                  }
+              });
+          }
       </script>
    </body>
 </html>
