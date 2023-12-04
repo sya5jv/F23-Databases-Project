@@ -8,11 +8,31 @@ if (!isset($_SESSION['loggedin'])) {
 include 'connect-db.php';
 
 $search_query = $_GET['search_query'] ?? '';
+$search_type = $_GET['search_type'] ?? 'name';
 
+$sql = "";
 
-$sql = "SELECT * FROM Movie WHERE name LIKE ? OR genre LIKE ?";
+if ($search_type === 'name') {
+    $sql = "SELECT * FROM Movie WHERE name LIKE ?";
+} elseif ($search_type === 'director') {
+    $sql = "SELECT * FROM Movie WHERE director LIKE ?";
+}
+elseif ($search_type === 'genre') {
+    $sql = "SELECT * FROM Movie WHERE genre LIKE ?";
+} 
+// $sql = "SELECT * FROM Movie WHERE name LIKE ? OR genre LIKE ?";
 $stmt = $db->prepare($sql); 
-$stmt->execute(["%$search_query%", "%$search_query%"]);
+
+if ($search_type === 'name') {
+    $stmt->execute(["%$search_query%"]);
+} elseif ($search_type === 'director') {
+    $stmt->execute(["%$search_query%"]);
+}
+elseif ($search_type === 'genre') {
+    $stmt->execute(["%$search_query%"]);
+}
+
+// $stmt->execute(["%$search_query%", "%$search_query%"]);
 
 $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
