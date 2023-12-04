@@ -50,8 +50,15 @@ $comments = $comment_stmt->fetchAll(PDO::FETCH_ASSOC);
 include 'navbar.php';
 ?>
 
+
+
 <!DOCTYPE html>
 <html>
+	<style>
+		input[type="number"] {
+			width: 300px;
+		}
+	</style>
 	<head>
 		<meta charset="utf-8">
 		<title>Profile Page</title>
@@ -126,13 +133,25 @@ include 'navbar.php';
 			<?php endif; ?>
 			<?php foreach ($comments as $comment): ?>
 			<h3>Comments</h3>
-			<div class="review">
+			<div class="comment">
 				<!-- <p><?php print_r($comment); ?></p> -->
 				<p><strong><?=$comment['username']?></strong></p>
 				<p><?=$comment['comment_content']?></p>
 				<p><i>Score: <?=$comment['score']?></i></p>
 			</div>
 			<?php endforeach; ?>
+			<div class="add-comment">
+				<h3>Add Comment</h3>
+				<form action="add-comment.php" method="post">
+					<input type="hidden" name="commenter_userId" value="<?=$_SESSION['UserId']?>" />
+					<input type="hidden" name="commentee_userId" value="<?=$comment['commentee_userId']?>" />
+					<input type="hidden" name="username" value="<?=$comment['username']?>" />
+					<textarea name="comment_content" placeholder="Your comment here" required></textarea>
+					<input type="number" name="score" min="1" max="10" placeholder="Leave a score to rate this user's profile" required>
+					<input type="submit" value="Post Comment">
+				</form>
+			</div>
 		</div>
 	</body>
 </html>
+

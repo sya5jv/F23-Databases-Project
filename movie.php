@@ -42,6 +42,11 @@ include "navbar.php";
 ?>
 <!DOCTYPE html>
 <html>
+    <style>
+		input[type="number"] {
+			width: 150px;
+		}
+	</style>
    <head>
       <meta charset="utf-8">
       <title><?= htmlspecialchars($movie['name']) ?></title>
