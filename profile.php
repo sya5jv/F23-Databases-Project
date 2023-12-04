@@ -148,7 +148,7 @@ include 'navbar.php';
 					<form action="add-comment.php" method="post">
 						<input type="hidden" name="commenter_userId" value="<?=$_SESSION['UserId']?>" />
 						<input type="hidden" name="commentee_userId" value="<?=$comment['commentee_userId']?>" />
-						<input type="hidden" name="username" value="<?=$comment['username']?>" />
+						<input type="hidden" name="commentee_username" value="<?=$username?>" />
 						<textarea name="comment_content" placeholder="Your comment here" required></textarea>
 						<input type="number" name="score" min="1" max="10" placeholder="Leave a score to rate this user's profile" required>
 						<input type="submit" value="Post Comment">
