@@ -23,7 +23,7 @@ if(!isset($_GET['username']) || $_GET['username'] == $_SESSION['Users']) {
 } else {
 	// Other user's profile
 	$username = $_GET['username'];
-	$stmt = $db->prepare('SELECT age, bio FROM Users WHERE :username = username'); // Note: No password query needed
+	$stmt = $db->prepare('SELECT UserId, age, bio FROM Users WHERE :username = username'); // Note: No password query needed
 }
 
 $stmt->bindValue('username', $username);
@@ -39,11 +39,13 @@ $bio = $results['bio'];
 $age = $results['age'];
 $stmt->closeCursor();
 
-// $comment_sql = "SELECT Comment.*, Users.UserId, Users.username
-// 				FROM Comment
-// 				WHERE Comment.commentee_userId = Users.UserId";
-// $comment_stmt = $db->prepare($comment_sql);
-// $comment_stmt->execute([$commenter])
+$comment_sql = "SELECT Comment.*, Users.UserId, Users.username
+				FROM Comment, Users
+				WHERE Comment.commentee_userId = {$results['UserId']} AND Comment.commenter_userId = Users.UserId";
+$comment_stmt = $db->prepare($comment_sql);
+$comment_stmt->execute();
+
+$comments = $comment_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include 'navbar.php';
 ?>
@@ -122,6 +124,15 @@ include 'navbar.php';
 					<button onclick="">Follow</button>
 				</div>
 			<?php endif; ?>
+			<?php foreach ($comments as $comment): ?>
+			<h3>Comments</h3>
+			<div class="review">
+				<!-- <p><?php print_r($comment); ?></p> -->
+				<p><strong><?=$comment['username']?></strong></p>
+				<p><?=$comment['comment_content']?></p>
+				<p><i>Score: <?=$comment['score']?></i></p>
+			</div>
+			<?php endforeach; ?>
 		</div>
 	</body>
 </html>
