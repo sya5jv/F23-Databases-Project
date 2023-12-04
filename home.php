@@ -3,7 +3,7 @@
 session_start();
 // If the user is not logged in redirect to the login page...
 if (!isset($_SESSION['loggedin'])) {
-	header('Location: index.html');
+	header('Location: index.php');
 	exit;
 }
 ?>
@@ -21,6 +21,7 @@ if (!isset($_SESSION['loggedin'])) {
 			<div>
 				<h1>Fresh Tomatoes</h1>
 				<a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
+				<a href="people-search.php"><i class="fas fa-user-circle"></i>Search Users</a>
 				<!-- Search Form -->
 				<form action="search.php" method="get" class="searchbar">
 					<input type="text" name="search_query" placeholder="Search for movies..." class="search-input">

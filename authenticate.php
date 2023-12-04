@@ -26,7 +26,7 @@
             
     // If user doesn't exist
     if($user === false){
-       echo "<script>alert('invalid username or password'); window.location.href='index.html'</script>";
+       echo "<script>alert('invalid username or password'); window.location.href='index.php'</script>";
     }
 
     else{
