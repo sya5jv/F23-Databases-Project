@@ -6,6 +6,8 @@ if (!isset($_SESSION['loggedin'])) {
 	header('Location: index.php');
 	exit;
 }
+
+include "navbar.php";
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +32,7 @@ if (!isset($_SESSION['loggedin'])) {
 				<a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>
 		</nav>
+
 		<div class="content">
 			<h2>Home Page</h2>
 			<p>Welcome back, <?=$_SESSION['Users']?>!</p>

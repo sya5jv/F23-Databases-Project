@@ -37,6 +37,8 @@ if (!$movie) {
     exit;
 }
 
+include "navbar.php";
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -46,17 +48,7 @@ if (!$movie) {
       <link href="style.css" rel="stylesheet" type="text/css">
    </head>
    <body class="loggedin">
-   <nav class="navtop">
-        <div>
-            <h1>Fresh Tomatoes</h1>
-            <a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
-            <form action="search.php" method="get" class="searchbar">
-                <input type="text" name="search_query" placeholder="Search for movies..." class="search-input">
-                <input type="submit" value="Search" class="search-button">
-            </form>
-            <a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </div>
-    </nav>
+
       <div class="content">
       <div class="movie-details">
          <div class="movie-title">
@@ -82,7 +74,7 @@ if (!$movie) {
          <p><strong>Runtime:</strong> <?= htmlspecialchars($movie['runtime']) ?> minutes</p>
          <p><strong>Genre:</strong> <?= htmlspecialchars($movie['genre']) ?></p>
          <p><strong>Summary:</strong> <?= nl2br(htmlspecialchars($movie['summary'])) ?></p>
-         <p><strong>Age Rating:</strong> <?= htmlspecialchars($movie['age_rating']) ?></p>
+
          <p><strong>Average Score:</strong> <?= htmlspecialchars($movie['average_movie_score']) ?></p>
          <p><strong>Director:</strong> <?= htmlspecialchars($movie['director']) ?></p>
       </div>
