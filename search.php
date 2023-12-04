@@ -15,6 +15,9 @@ $stmt = $db->prepare($sql);
 $stmt->execute(["%$search_query%", "%$search_query%"]);
 
 $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+include "navbar.php";
+
 ?>
 
 <!DOCTYPE html>
@@ -25,17 +28,7 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="loggedin search-page"> 
-    <nav class="navtop">
-        <div>
-            <h1>Fresh Tomatoes</h1>
-            <a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
-            <form action="search.php" method="get" class="searchbar">
-                <input type="text" name="search_query" placeholder="Search for movies..." class="search-input">
-                <input type="submit" value="Search" class="search-button">
-            </form>
-            <a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </div>
-    </nav>
+
     <div class="content">
         <h2>Search Results</h2>
         <?php foreach ($movies as $movie): ?>
