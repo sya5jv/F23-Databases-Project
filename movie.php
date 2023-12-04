@@ -38,6 +38,7 @@ if (!$movie) {
 }
 
 include "navbar.php";
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -47,6 +48,7 @@ include "navbar.php";
       <link href="style.css" rel="stylesheet" type="text/css">
    </head>
    <body class="loggedin">
+
       <div class="content">
       <div class="movie-details">
          <div class="movie-title">
@@ -72,7 +74,7 @@ include "navbar.php";
          <p><strong>Runtime:</strong> <?= htmlspecialchars($movie['runtime']) ?> minutes</p>
          <p><strong>Genre:</strong> <?= htmlspecialchars($movie['genre']) ?></p>
          <p><strong>Summary:</strong> <?= nl2br(htmlspecialchars($movie['summary'])) ?></p>
-         <!-- <p><strong>Age Rating:</strong> <?= htmlspecialchars($movie['age_rating']) ?></p> -->
+
          <p><strong>Average Score:</strong> <?= htmlspecialchars($movie['average_movie_score']) ?></p>
          <p><strong>Director:</strong> <?= htmlspecialchars($movie['director']) ?></p>
       </div>

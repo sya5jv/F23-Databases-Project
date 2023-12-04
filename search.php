@@ -15,7 +15,9 @@ $stmt = $db->prepare($sql);
 $stmt->execute(["%$search_query%", "%$search_query%"]);
 
 $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 include "navbar.php";
+
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +28,7 @@ include "navbar.php";
     <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="loggedin search-page"> 
+
     <div class="content">
         <h2>Search Results</h2>
         <?php foreach ($movies as $movie): ?>
