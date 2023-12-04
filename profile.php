@@ -55,14 +55,14 @@ $follow_count_stmt = $db->prepare($follow_count_sql);
 $follow_count_stmt->execute();
 $follow_count = $follow_count_stmt->fetch();
 
-$following_sql = "SELECT Users.username
-				FROM Follows
-				INNER JOIN Users ON Follows.user2_userId = Users.UserId
-				WHERE Follows.user1_userId = {$results['UserId']} AND Follows.user2_userId = Users.UserId";
-$following_sql_stmt = $db->prepare($following_sql);
-$following_sql_stmt->execute();
-$following = $following_sql_stmt->fetch();
-print_r($following);
+// $following_sql = "SELECT *
+// 				FROM Follows
+// 				JOIN Users ON Follows.user2_userId = Users.UserId
+// 				WHERE Follows.user1_userId = {$results['UserId']}";
+// $following_sql_stmt = $db->prepare($following_sql);
+// $following_sql_stmt->execute();
+// $following = $following_sql_stmt->fetch();
+// print_r($following);
 
 $comment_sql = "SELECT Comment.*, Users.UserId, Users.username
 				FROM Comment, Users
@@ -147,10 +147,10 @@ include 'navbar.php';
 				</button>
 			</div>
 			<?php endif; ?>
-			<h3>Following:</h3>
+			<!-- <h3>Following:</h3>
 			<?php foreach ($following as $follow): ?>
 				<p><?=$follow?></p>	
-			<?php endforeach; ?>
+			<?php endforeach; ?> -->
 			<h3>Comments</h3>
 			<?php foreach ($comments as $comment): ?>
 			<div class="comment">
@@ -160,6 +160,7 @@ include 'navbar.php';
 				<p><i>Score: <?=$comment['score']?></i></p>
 			</div>
 			<?php endforeach; ?>
+			<?php if (!$is_current_user_profile): ?>
 				<div class="add-comment">
 					<h3>Add Comment</h3>
 					<form action="add-comment.php" method="post">
@@ -171,6 +172,7 @@ include 'navbar.php';
 						<input type="submit" value="Post Comment">
 					</form>
 				</div>
+			<?php endif; ?>
 		</div>
 		<script>
 			document.querySelector('.follow-button').addEventListener('click', function() {
