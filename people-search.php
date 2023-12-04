@@ -6,7 +6,9 @@ if (!isset($_SESSION['loggedin'])) {
 }
 
 include 'connect-db.php';
+
 include 'navbar.php';
+
 
 $search_query = $_GET['search_query'] ?? '';
 
@@ -26,6 +28,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="loggedin search-page"> 
+
     <div class="content">
         <h2>Search for Users</h2>
         <form action="people-search.php" method="get" class="searchbar">
