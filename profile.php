@@ -18,7 +18,7 @@ $is_current_user_profile = false;
 if(!isset($_GET['username']) || $_GET['username'] == $_SESSION['Users']) {
 	// Current user's profile
 	$username = $_SESSION['Users'];
-	$stmt = $db->prepare('SELECT password, age, bio FROM Users WHERE :username = username');
+	$stmt = $db->prepare('SELECT password, UserId, age, bio FROM Users WHERE :username = username');
 	$GLOBALS['is_current_user_profile'] = true;
 } else {
 	// Other user's profile
@@ -48,6 +48,21 @@ if (!$is_current_user_profile) {
     $isFollowing = $followCheckStmt->fetchColumn() > 0;
 }
 
+$follow_count_sql = "SELECT COUNT(*) 
+					FROM Follows
+					WHERE user2_userId = {$results['UserId']}";
+$follow_count_stmt = $db->prepare($follow_count_sql);
+$follow_count_stmt->execute();
+$follow_count = $follow_count_stmt->fetch();
+
+$following_sql = "SELECT Users.username
+				FROM Follows
+				INNER JOIN Users ON Follows.user2_userId = Users.UserId
+				WHERE Follows.user1_userId = {$results['UserId']} AND Follows.user2_userId = Users.UserId";
+$following_sql_stmt = $db->prepare($following_sql);
+$following_sql_stmt->execute();
+$following = $following_sql_stmt->fetch();
+print_r($following);
 
 $comment_sql = "SELECT Comment.*, Users.UserId, Users.username
 				FROM Comment, Users
@@ -101,7 +116,7 @@ include 'navbar.php';
 				<tr>
 					<td>Followers:</td>
 					<!-- #TODO: Fix this -->
-					<td><?=$_SESSION['loggedin']?></td>
+					<td><?=$follow_count[0]?></td>
 				</tr>
 				</table>
 				<button onclick="window.location.href='updateProfile.php'">Update Profile</button>
@@ -124,18 +139,20 @@ include 'navbar.php';
 					<td><?=$age?></td>
 				</tr>
 				<tr>
-					<td>Followers:</td>
-					<td>IMPLEMENT THIS</td>
+					<td>Followers: <?=$follow_count[0]?></td>
 				</tr>
 				</table>
-				<!-- Implement this -->
-				<button class="follow-button" data-action="<?= $isFollowing ? 'unfollow' : 'follow' ?>" data-user-id="<?= $results['UserId'] ?>">
+				<button class="follow-button" data-action="<?= $isFollowing ? 'unfollow' : 'follow' ?>" data-user-id="<?= $results['UserId']?>">
 				<?= $isFollowing ? 'Unfollow' : 'Follow' ?>
 				</button>
 			</div>
 			<?php endif; ?>
-			<?php foreach ($comments as $comment): ?>
+			<h3>Following:</h3>
+			<?php foreach ($following as $follow): ?>
+				<p><?=$follow?></p>	
+			<?php endforeach; ?>
 			<h3>Comments</h3>
+			<?php foreach ($comments as $comment): ?>
 			<div class="comment">
 						<!-- <p><?php print_r($comment); ?></p> -->
 				<p><strong><?=$comment['username']?></strong></p>
@@ -159,6 +176,7 @@ include 'navbar.php';
 			document.querySelector('.follow-button').addEventListener('click', function() {
 				var userId = this.getAttribute('data-user-id');
 				var action = this.getAttribute('data-action');
+				var username = this.getAttribute('data-username');
 			
 				fetch(action === 'follow' ? 'follow.php' : 'unfollow.php', {
 					method: 'POST',

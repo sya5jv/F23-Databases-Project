@@ -42,7 +42,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <!-- <p>Followers: <?=$user['followers'] ?></p> -->
                     </div>
                 </a>
-                <input type="button" value="Follow" class="follow-btn">
             </div>
         <?php endforeach; ?>
     </div>
