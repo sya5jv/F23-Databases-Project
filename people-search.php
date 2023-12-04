@@ -7,6 +7,9 @@ if (!isset($_SESSION['loggedin'])) {
 
 include 'connect-db.php';
 
+include 'navbar.php';
+
+
 $search_query = $_GET['search_query'] ?? '';
 
 
@@ -25,17 +28,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="loggedin search-page"> 
-    <nav class="navtop">
-        <div>
-            <h1>Fresh Tomatoes</h1>
-            <a href="profile.php"><i class="fas fa-user-circle"></i>Profile</a>
-            <form action="search.php" method="get" class="searchbar">
-                <input type="text" name="search_query" placeholder="Search for movies..." class="search-input">
-                <input type="submit" value="Search" class="search-button">
-            </form>
-            <a href="logout.php"><i class="fas fa-sign-out-alt"></i>Logout</a>
-        </div>
-    </nav>
+
     <div class="content">
         <h2>Search for Users</h2>
         <form action="people-search.php" method="get" class="searchbar">
