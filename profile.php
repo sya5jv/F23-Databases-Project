@@ -5,25 +5,45 @@ require 'connect-db.php';
 // We need to use sessions, so you should always start sessions using the below code.
 // If the user is not logged in redirect to the login page...
 if (!isset($_SESSION['loggedin'])) {
-	header('Location: index.html');
+	header('Location: index.php');
 	exit;
 }
 
-//  $db = new PDO($dsn, $username, $password);
-$username = $_SESSION['Users'];
 // We don't have the password or email info stored in sessions, so instead, we can get the results from the database.
-$stmt = $db->prepare('SELECT password, age, bio FROM Users WHERE :username = username');
 // In this case we can use the account ID to get the account info.
+
+// Keep track of whether or not the current profile query belongs to the current user
+$is_current_user_profile = false;
+
+if(!isset($_GET['username']) || $_GET['username'] == $_SESSION['Users']) {
+	// Current user's profile
+	$username = $_SESSION['Users'];
+	$stmt = $db->prepare('SELECT password, age, bio FROM Users WHERE :username = username');
+	$GLOBALS['is_current_user_profile'] = true;
+} else {
+	// Other user's profile
+	$username = $_GET['username'];
+	$stmt = $db->prepare('SELECT age, bio FROM Users WHERE :username = username'); // Note: No password query needed
+}
 
 $stmt->bindValue('username', $username);
 $stmt->execute();
 $results = $stmt->fetch();
 
 // parameters for the Users account
-$pass = $results['password'];
+
+if ($is_current_user_profile) {
+	$pass = $results['password'];
+}
 $bio = $results['bio'];
 $age = $results['age'];
 $stmt->closeCursor();
+
+// $comment_sql = "SELECT Comment.*, Users.UserId, Users.username
+// 				FROM Comment
+// 				WHERE Comment.commentee_userId = Users.UserId";
+// $comment_stmt = $db->prepare($comment_sql);
+// $comment_stmt->execute([$commenter])
 
 include 'navbar.php';
 ?>
@@ -49,32 +69,59 @@ include 'navbar.php';
 
 		<div class="content">
 			<h2>Profile Page</h2>
-			<div>
-				<p>Your account details are below:</p>
-				<table>
-					<tr>
-						<td>Username:</td>
-						<td><?=$_SESSION['Users']?></td>
-					</tr>
-					<tr>
-						<td>Password:</td>
-						<td><?php echo "*******"?></td>
-					</tr>
-					<tr>
-						<td>Bio:</td>
-						<td><?=$bio?></td>
-					</tr>
-					<tr>
-						<td>Age:</td>
-						<td><?=$age?></td>
-					</tr>
-					<tr>
-						<td>Friend:</td>
-						<td><?=$_SESSION['loggedin']?></td>
-					</tr>
-				</table>
-				<button onclick="window.location.href='updateProfile.php'">Update Profile</button>
-			</div>
+			<?php if($is_current_user_profile): ?>
+				<div>
+					<p>Your account details are below:</p>
+					<table>
+						<tr>
+							<td>Username:</td>
+							<td><?=$_SESSION['Users']?></td>
+						</tr>
+						<tr>
+							<td>Password:</td>
+							<td><?php echo "********"?></td>
+						</tr>
+						<tr>
+							<td>Bio:</td>
+							<td><?=$bio?></td>
+						</tr>
+						<tr>
+							<td>Age:</td>
+							<td><?=$age?></td>
+						</tr>
+						<tr>
+							<td>Followers:</td>
+							<!-- #TODO: Fix this -->
+							<td><?=$_SESSION['loggedin']?></td>
+						</tr>
+					</table>
+					<button onclick="window.location.href='updateProfile.php'">Update Profile</button>
+				</div>
+			<?php else: ?>
+				<div>
+					<p><?=$username?>'s Profile:<p>
+					<table>
+						<tr>
+							<td>Username:</td>
+							<td><?=$username?></td>
+						</tr>
+						<tr>
+							<td>Bio:</td>
+							<td><?=$bio?></td>
+						</tr>
+						<tr>
+							<td>Age:</td>
+							<td><?=$age?></td>
+						</tr>
+						<tr>
+							<td>Followers:</td>
+							<td>IMPLEMENT THIS</td>
+						</tr>
+					</table>
+					<!-- Implement this -->
+					<button onclick="">Follow</button>
+				</div>
+			<?php endif; ?>
 		</div>
 	</body>
 </html>
